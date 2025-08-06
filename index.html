@@ -1,6 +1,222 @@
-<html>
-<head><title>Birthday Wish</title></head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Happy Birthday Madhumitha!</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #1b2735;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      color: white;
+      overflow: hidden;
+    }
+
+    h1 {
+      margin-top: 80px;
+      font-size: 3em;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    p {
+      font-size: 1.5em;
+      margin-top: 20px;
+      animation: slideUp 2s ease-in-out 1s forwards;
+      opacity: 0;
+    }
+
+    .balloon {
+      position: absolute;
+      bottom: -100px;
+      width: 50px;
+      height: 70px;
+      background-color: #ff69b4;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      animation: float 10s linear infinite;
+      z-index: 1;
+    }
+
+    .balloon::after {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      width: 2px;
+      height: 20px;
+      background: white;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes slideUp {
+      to { opacity: 1; transform: translateY(-20px); }
+    }
+
+    @keyframes float {
+      0% {
+        bottom: -100px;
+        transform: translateX(0) rotate(0deg);
+      }
+      100% {
+        bottom: 110%;
+        transform: translateX(100px) rotate(360deg);
+      }
+    }
+
+    .share-button {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #25D366;
+      padding: 12px 24px;
+      border-radius: 30px;
+      color: white;
+      font-size: 18px;
+      text-decoration: none;
+      box-shadow: 0 0 10px #25D366;
+      z-index: 10;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
 <body>
-  <h1>Happy Birthday! 🎉</h1>
+
+  <audio autoplay loop>
+    <source src="https://www.computerhope.com/jargon/m/example.mp3" type="audio/mpeg">
+    Your browser does not support audio.
+  </audio>
+
+  <h1>🎉 Happy Birthday Madhumitha! 🎂</h1>
+  <p>To my best friend ❤️<br>
+     Wishing you joy, success, and unforgettable memories! 🎁🎈</p>
+
+  <!-- Balloons -->
+  <div class="balloon" style="left: 10%; animation-delay: 0s;"></div>
+  <div class="balloon" style="left: 30%; animation-delay: 2s;"></div>
+  <div class="balloon" style="left: 50%; animation-delay: 4s;"></div>
+  <div class="balloon" style="left: 70%; animation-delay: 1s;"></div>
+  <div class="balloon" style="left: 90%; animation-delay: 3s;"></div>
+
+  <!-- WhatsApp Share Button -->
+  <a class="share-button" href="https://wa.me/?text=🎉%20Happy%20Birthday%20Madhumitha!%20Here's%20a%20special%20surprise%20for%20you!%20🎁%20Check%20this%20out%20👉%20https://amalanathan00.github.io/Birthday-wish/" target="_blank">
+  🎁 Share on WhatsApp
+</a>
+
+  <!-- Fireworks Canvas -->
+  <canvas id="fireworks"></canvas>
+
+  <script>
+    // Fireworks effect
+    const canvas = document.getElementById('fireworks');
+    const ctx = canvas.getContext('2d');
+    let fireworks = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.onresize = resizeCanvas;
+
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    class Firework {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = random(0, canvas.width);
+        this.y = canvas.height;
+        this.targetY = random(100, canvas.height / 2);
+        this.color = `hsl(${Math.floor(random(0, 360))}, 100%, 50%)`;
+        this.radius = 2;
+        this.speed = random(3, 5);
+        this.exploded = false;
+        this.particles = [];
+      }
+
+      update() {
+        if (!this.exploded) {
+          this.y -= this.speed;
+          if (this.y <= this.targetY) {
+            this.exploded = true;
+            for (let i = 0; i < 30; i++) {
+              this.particles.push(new Particle(this.x, this.y, this.color));
+            }
+          }
+        } else {
+          this.particles.forEach(p => p.update());
+          this.particles = this.particles.filter(p => p.life > 0);
+          if (this.particles.length === 0) this.reset();
+        }
+      }
+
+      draw() {
+        if (!this.exploded) {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+        } else {
+          this.particles.forEach(p => p.draw());
+        }
+      }
+    }
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.life = 60;
+        this.color = color;
+        this.angle = random(0, Math.PI * 2);
+        this.speed = random(1, 4);
+      }
+
+      update() {
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed;
+        this.life--;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 5; i++) {
+      fireworks.push(new Firework());
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      fireworks.forEach(f => {
+        f.update();
+        f.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+
 </body>
 </html>
